@@ -27,6 +27,17 @@
             border-radius: 15px;
             padding: 15px;
         }
+
+        #remaining-guesses {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        #reset-button {
+            margin-top: 20px;
+        }
     </style>
 
 </head>
@@ -54,33 +65,37 @@
     </div>
 
     <script>
-        // JavaScript code goes here
-        // Generate a number 1-10
-        const randomNumber = Math.floor(Math.random() * 10) + 1;
+        
+        let randomNumber = Math.floor(Math.random() * 10) + 1;
         let attempts = 0;
         const maxAttempts = 3;
 
-        // display message to user
         function displayMessage(message) {
-            document.getElementById('Welcome to our number guessing game! A random number 1 through 10 will be generated. You will then be given 3 attempts to guess the correct number. Good Luck!').textContent = message;
+            document.getElementById('message').textContent = message;
         }
 
-        // check player's first guess
+        // update remaining guesses function
+        function updateRemainingGuesses() {
+            const remaining = maxAttempts - attempts;
+            document.getElementById('remaining-guesses').textContent = `Remaining guesses: ${remaining}`;
+        }
+
+        // check guess function
         function checkGuess() {
             const guessInput = document.getElementById('guess-input');
             const playerGuess = parseInt(guessInput.value);
 
+            // check valid input
             if (isNaN(playerGuess) || playerGuess < 1 || playerGuess > 10) {
                 displayMessage("Please enter a number between 1 and 10.");
                 return;
             }
 
-            // if first guess is incorrect, add to attempt counter
             attempts++;
 
-            // check guess is too high or too low
+            // check user guess
             if (playerGuess === randomNumber) {
-                displayMessage("Congratulations! You guessed correctly.");
+                displayMessage(`Congratulations! You guessed correctly in ${attempts} ${attempts === 1 ? 'attempt' : 'attempts'}.`);
                 document.getElementById('guess-button').disabled = true;
             } else if (playerGuess > randomNumber) {
                 displayMessage("Your guess is too high.");
@@ -88,25 +103,46 @@
                 displayMessage("Your guess is too low.");
             }
 
-            // check if player still has attempts left
+            // update remaining guesses
+            updateRemainingGuesses();
+
+            // check attempts
             if (attempts === maxAttempts && playerGuess !== randomNumber) {
                 displayMessage(`Game Over! The correct number was ${randomNumber}.`);
                 document.getElementById('guess-button').disabled = true;
             }
 
-            // Clear the input field for the next guess
+            // clear input field for next guess
             guessInput.value = '';
         }
 
-        // Added a click listener to the button (will be covered more in zyBook 7.4), 
-        // for now just use the following which:
-        // uses the document object and selects the element with a matching Id found in the DOM.
-        // adds an event listener (for a click) of that selected element.
-        // executes the code in the body of the anonymous function
+        // reset game function
+        function resetGame() {
+            randomNumber = Math.floor(Math.random() * 10) + 1;
+            attempts = 0;
+            document.getElementById('message').textContent = '';
+            document.getElementById('guess-input').value = '';
+            document.getElementById('guess-button').disabled = false;
+            updateRemainingGuesses();
+        }
+
+        // guess button event listener
         document.getElementById('guess-button').addEventListener('click', function () {
-            //function body -- any code here will be executed when the registered event is triggered.
+            checkGuess();
         });
 
+        // add reset button
+        const resetButton = document.createElement('button');
+        resetButton.textContent = 'Reset Game';
+        resetButton.id = 'reset-button';
+        resetButton.addEventListener('click', resetGame);
+        document.body.appendChild(resetButton);
+
+        // show remaining guesses
+        const remainingGuessesElement = document.createElement('p');
+        remainingGuessesElement.id = 'remaining-guesses';
+        document.body.appendChild(remainingGuessesElement);
+        updateRemainingGuesses();
     </script>
 </body>
 
